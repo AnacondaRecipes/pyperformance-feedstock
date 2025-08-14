@@ -1,50 +1,59 @@
 {% set name = "pyperformance" %}
-{% set version = "1.0.1" %}
+{% set version = "1.11.0" %}
 
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: 6522d28a539ccd28a3da51e8ec1f5891dd05e917d16d7d1d7f1bccdc4b8922ce
+  url: https://github.com/python/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: 9b53bd4110758fee437ba8ab6caff527186d761276c3627bf5f23f302e6fcc8f
 
 build:
   number: 0
-  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   entry_points:
     - pyperformance=pyperformance.cli:main
-  script: "{{ PYTHON }} -m pip install . -vv"
+  skip: true  # [py<37]
 
 requirements:
   host:
     - pip
-    - pyperf
     - python
+    - wheel
+    - setuptools >=61
   run:
-    - pyperf
     - python
+    - pyperf
+    - tomli  # [py<311]
+    - packaging
 
 test:
   imports:
     - pyperformance
-    - pyperformance.benchmarks
-    - pyperformance.benchmarks.data
-    # Syntax error on import statement?
-    # - pyperformance.benchmarks.data.2to3
-    - pyperformance.tests
-    - pyperformance.tests.data
+    - pyperformance.cli
+    - pyperformance.commands
+    - pyperformance.venv
   commands:
+    - pip check
     - pyperformance --help
+    # Tests trying to create venv, and dev.py needs to be added to the site-pkg dir. Just skip tests with dev.py. Don`t want increase sp_dir.
+    - pytest --pyargs pyperformance.tests --deselect=test_commands.py::FullStackTests
+  requires:
+    - pip
+    - pytest
 
 about:
-  home: "https://github.com/python/benchmarks"
+  home: https://github.com/python/pyperformance
   license: MIT
   license_family: MIT
-  license_file: 
-  summary: "Python benchmark suite"
-  doc_url: 
-  dev_url: 
+  license_file: COPYING
+  summary: Python benchmark suite
+  description: |
+    The pyperformance project is intended to be an authoritative source of benchmarks for all Python implementations.
+    The focus is on real-world benchmarks, rather than synthetic benchmarks, using whole applications when possible.
+  doc_url: https://pyperformance.readthedocs.io
+  dev_url: https://github.com/python/pyperformance
 
 extra:
   recipe-maintainers:
