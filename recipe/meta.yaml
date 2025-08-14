@@ -33,7 +33,7 @@ requirements:
 #E       -                   _base_executable='$PREFIX/bin/python3.12',
 #E       +                   _base_executable='/private$PREFIX/bin/python3.12',
 #E       ?                                     ++++++++
-{% set deselect_tests = deselect_tests + " --deselect=test_pythoninfo.py::GetInfoTests::test_venv" %}  # [osx and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=test_pythoninfo.py::GetInfoTests::test_venv" %}  # [osx]
 
 test:
   imports:
