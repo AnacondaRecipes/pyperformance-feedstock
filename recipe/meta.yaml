@@ -28,6 +28,13 @@ requirements:
     - tomli  # [py<311]
     - packaging
 
+# FullStackTests trying to create venv, and dev.py needs to be added to the site-pkg dir. Just skip tests with dev.py. Don`t want increase sp_dir.
+{% set deselect_tests = " --deselect=test_commands.py::FullStackTests" %}
+#E       -                   _base_executable='$PREFIX/bin/python3.12',
+#E       +                   _base_executable='/private$PREFIX/bin/python3.12',
+#E       ?                                     ++++++++
+{% set deselect_tests = deselect_tests + " --deselect=test_pythoninfo.py::GetInfoTests::test_venv" %}  # [osx and arm64]
+
 test:
   imports:
     - pyperformance
@@ -37,8 +44,7 @@ test:
   commands:
     - pip check
     - pyperformance --help
-    # Tests trying to create venv, and dev.py needs to be added to the site-pkg dir. Just skip tests with dev.py. Don`t want increase sp_dir.
-    - pytest --pyargs pyperformance.tests --deselect=test_commands.py::FullStackTests
+    - pytest --pyargs pyperformance.tests {{ deselect_tests }}
   requires:
     - pip
     - pytest
