@@ -1,13 +1,19 @@
 {% set name = "pyperformance" %}
-{% set version = "1.11.0" %}
+{% set version = "1.14.0" %}
+{% set deselect_tests = " --deselect=test_commands.py::FullStackTests" %}
+{% set deselect_tests = 'deselect_tests + " --deselect=test_pythoninfo.py::GetInfoTests::test_venv"' %}  # [osx]
 
+# FullStackTests trying to create venv, and dev.py needs to be added to the site-pkg dir. Just skip tests with dev.py. Don`t want increase sp_dir.
+#E       -                   _base_executable='$PREFIX/bin/python3.12',
+#E       +                   _base_executable='/private$PREFIX/bin/python3.12',
+#E       ?                                     ++++++++
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
   url: https://github.com/python/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: 9b53bd4110758fee437ba8ab6caff527186d761276c3627bf5f23f302e6fcc8f
+  sha256: 2eb90812292522297bb046e589e0876c00ec5b5f49e8653eca39f8fd942840ed
 
 build:
   number: 0
@@ -26,13 +32,6 @@ requirements:
     - pyperf
     - tomli  # [py<311]
     - packaging
-
-# FullStackTests trying to create venv, and dev.py needs to be added to the site-pkg dir. Just skip tests with dev.py. Don`t want increase sp_dir.
-{% set deselect_tests = " --deselect=test_commands.py::FullStackTests" %}
-#E       -                   _base_executable='$PREFIX/bin/python3.12',
-#E       +                   _base_executable='/private$PREFIX/bin/python3.12',
-#E       ?                                     ++++++++
-{% set deselect_tests = deselect_tests + " --deselect=test_pythoninfo.py::GetInfoTests::test_venv" %}  # [osx]
 
 test:
   imports:
